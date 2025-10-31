@@ -19,6 +19,10 @@ const IncidentsSection: NextPage = () => {
 		<div className="mt-5">
 			{isIncidentsLoading ? (
 				<p>Loading...</p>
+			) : (monthlyIncidents as MonthlyIncident[]).length === 0 ? (
+				<div className="text-center py-8">
+					<p className="text-gray-500 text-lg">No incidents reported.</p>
+				</div>
 			) : (
 				<div>
 					{(monthlyIncidents as MonthlyIncident[]).map((incidents) => (

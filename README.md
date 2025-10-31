@@ -1,84 +1,98 @@
+# Spendflo Status Page
 
-# Fettle 💟 
+Real-time system status and uptime monitoring for Spendflo services, powered by GitHub Actions and Pages.
 
-**Fettle** is the open-source status page, powered entirely by GitHub Actions, Issues, and Pages.
+<img src="./public/ss.png" alt="Spendflo Status Page" />
 
-<img src="./public/ss.png" />
+## Overview
 
+This status page monitors the availability and performance of Spendflo's critical services:
+- **V2 APIs** - Core API endpoints
+- **V3 APIs** - Next-generation API services
+- **Dashboard** - Web application interface
 
-# Usage
-First of all, you need to fork this repository.
+## How It Works
 
-## Update URL's
-Update the urls and name in `urls.cfg` file present in `public > urls.cfg` file.
+### Architecture
+
+- **Hosting**: GitHub Pages with custom CNAME domain
+- **Monitoring**: Automated health checks via GitHub Actions (runs every 24 hours)
+- **Data Storage**: Health check logs committed directly to the repository
+- **Incidents**: Managed through GitHub Issues with the `incident` label
+- **Tech Stack**: Next.js 14, TypeScript, Tailwind CSS
+
+### Monitoring Process
+
+1. GitHub Actions workflow (`health-check.yml`) runs on a scheduled basis
+2. Each service URL is tested with up to 3 retry attempts
+3. Response status and response time are logged
+4. Results are committed to `public/status/{service}_report.log`
+5. Frontend displays the last 90 days of uptime data
+
+## Configuration
+
+### Monitored Services
+
+Services are defined in `public/urls.cfg`:
 
 ```text
-Google=https://google.com
-Facebook=https://facebook.com
+V2-Apis=https://api-v2.spendflo.com/health
+V3-Apis=https://api-v2.spendflo.com/v3/q/health
+Dashboard=https://app.spendflo.com/
 ```
 
-## Incidents URL update
-Go to `src > incidents > hooks > useIncidents.tsx` file and update the url with your repository url.
+### Monitoring Frequency
 
-Replace **mehatab/fettle** with your **username/repo-name**
-```
-https://api.github.com/repos/mehatab/fettle/issues?per_page=20&state=all&labels=incident
-```
-
-## Service status URL update
-Go to `src > services > hooks > useServices.tsx` file and update the url with your repository url.
-
-Replace **mehatab/fettle** with your **username/repo-name**
-```
-https://raw.githubusercontent.com/mehatab/fettle/main/public/status/${key}_report.log
-```
-
-Go to `src > services > hooks > useSystemStatus.tsx` file and update the url with your repository url.
-
-Replace **mehatab/fettle** with your **username/repo-name**
-```
-https://raw.githubusercontent.com/mehatab/fettle/main/public/status/${key}_report.log
-```
-
-## Deployment setup
-
-Then, you need to enable GitHub Pages on your forked repository. You can do this by going to `Settings > Pages` and enabling it on the `main` branch.
-
-In Build and deployment section select GitHub Actions.
-
-## Change monitoring interval
-If you want to change the time interval of monitoring then you can change it in `.github > workflows > health-check.yml` file.
-update the cron time in the following line.
+Adjust the cron schedule in `.github/workflows/health-check.yml`:
 
 ```yaml
-    on:
-      schedule:
-        - cron: "0 0/12 * * *"
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Daily at midnight UTC
 ```
 
-## Reporting your first incident
-1. Go to issues tab 
-2. Create a new label `incident`
-3. Create a issue
-4. Add the label `incident` to the issue
+### Repository URLs
 
+The application fetches data from this repository. URLs are configured in:
+- `src/incidents/hooks/useIncidents.tsx` - GitHub Issues API
+- `src/services/hooks/useServices.tsx` - Status log files
+- `src/services/hooks/useSystemStatus.tsx` - Status log files
 
-# How it works
+Current configuration: `https://github.com/spendflo/fettle`
 
-- Hosting
-    - GitHub Pages is used for hosting the status page.
+## Incident Management
 
-- Monitoring
-    - Github Workflow will be triggered every 1 Hr (Configurable) to visit the website.
-    - Response status and response time is commited to github repository.
+### Creating an Incident
 
-- Incidents
-    - Github issue is used for incident management.
+1. Go to the [Issues](https://github.com/spendflo/fettle/issues) tab
+2. Create a new issue describing the incident
+3. Add the `incident` label
+4. The incident will automatically appear on the status page
 
-# Contributing
-Feel free to submit pull requests and/or file issues for bugs and suggestions.
+### Closing an Incident
 
-<!-- GitAds-Verify: ELLTZF12YAL6BP8TCGDR5ONTHV6GIHR1 -->
+Close the issue when the incident is resolved. Closed incidents are still displayed in the incident history.
 
-[![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=mehatab/fettle@github)](https://gitads.dev/v1/ad-track?source=mehatab/fettle@github)
+## Development
 
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Lint code
+npm run lint
+```
+
+## Deployment
+
+The status page automatically deploys via GitHub Actions when changes are pushed to the `main` branch. The workflow builds the Next.js static site and publishes it to GitHub Pages.
+
+## License
+
+This project is based on [Fettle](https://github.com/mehatab/fettle), an open-source status page solution.

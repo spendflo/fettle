@@ -11,6 +11,23 @@ const ServicesSection: NextPage = () => {
     const [data, isServicesLoading] = useServices();
     const {systemStatus, isLoading} = useSystemStatus();
 
+    const formatDateTime = (datetime?: string) => {
+        if (!datetime) return 'N/A';
+        try {
+            const date = new Date(datetime);
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        } catch {
+            return datetime;
+        }
+    };
+
     const Icon = () => {
         if (systemStatus?.status === Status.OPERATIONAL) {
             return <svg className="h-6 w-6 flex-none fill-sky-100 stroke-green-500 stroke-2">
@@ -43,7 +60,7 @@ const ServicesSection: NextPage = () => {
                     </div>
                     <div>
                         <p className="text-xs text-gray-400">Last updated</p>
-                        <p className="text-xs text-gray-400 text-end ">{systemStatus?.datetime}</p>
+                        <p className="text-xs text-gray-400 text-end ">{formatDateTime(systemStatus?.datetime)}</p>
                     </div>
                 </div>
             </div>
